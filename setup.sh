@@ -68,7 +68,10 @@ ok "Team brain is in your home folder: team-brain"
 say "Step 5 of 5: setting up Claude with the team rules"
 mkdir -p "$HOME/.claude/skills"
 echo "$NAME" > "$HOME/.claude/team-name"
-[ -f "$HOME/.claude/CLAUDE.md" ] && [ ! -L "$HOME/.claude/CLAUDE.md" ] && mv "$HOME/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md.before-team-$(date +%s)"
+if [ -f "$HOME/.claude/CLAUDE.md" ] && [ ! -L "$HOME/.claude/CLAUDE.md" ]; then   # keep your own rules working: they move to ~/.claude/rules
+  mkdir -p "$HOME/.claude/rules"; mv "$HOME/.claude/CLAUDE.md" "$HOME/.claude/rules/my-own-rules.md"
+  echo "Your own Claude rules are kept, now in ~/.claude/rules/my-own-rules.md"
+fi
 ln -sfn "$BRAIN/setup/CLAUDE-$NAME.md" "$HOME/.claude/CLAUDE.md"
 while read -r s; do [ -n "$s" ] && [ -d "$BRAIN/shared/skills/$s" ] && ln -sfn "$BRAIN/shared/skills/$s" "$HOME/.claude/skills/$s"; done < "$BRAIN/setup/skills-$NAME.txt"
 /usr/bin/python3 "$BRAIN/setup/merge_settings.py" "$HOME/.claude/settings.json" >/dev/null
