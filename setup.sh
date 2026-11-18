@@ -37,7 +37,7 @@ fi
 [ -z "$NEED" ] || brew install -q $NEED || die "Tool install stopped."
 git --version >/dev/null 2>&1 || die "git is missing. Apple's developer tools did not install."
 if [ "$NAME" = "chelzi" ]; then
-  /usr/bin/python3 -c "import PIL, faster_whisper" 2>/dev/null || /usr/bin/python3 -m pip install --user -q pillow faster-whisper || die "Python video tools did not install."
+  /usr/bin/python3 -c "import PIL, faster_whisper" 2>/dev/null || /usr/bin/python3 -m pip install --user -q --disable-pip-version-check --no-warn-script-location pillow faster-whisper || die "Python video tools did not install."
   M="$HOME/.claude/workspace/models/ggml-small.bin"
   if [ ! -s "$M" ]; then
     echo "Downloading the speech-to-text model (about 470 MB)..."
@@ -71,7 +71,7 @@ echo "$NAME" > "$HOME/.claude/team-name"
 [ -f "$HOME/.claude/CLAUDE.md" ] && [ ! -L "$HOME/.claude/CLAUDE.md" ] && mv "$HOME/.claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md.before-team-$(date +%s)"
 ln -sfn "$BRAIN/setup/CLAUDE-$NAME.md" "$HOME/.claude/CLAUDE.md"
 while read -r s; do [ -n "$s" ] && [ -d "$BRAIN/shared/skills/$s" ] && ln -sfn "$BRAIN/shared/skills/$s" "$HOME/.claude/skills/$s"; done < "$BRAIN/setup/skills-$NAME.txt"
-/usr/bin/python3 "$BRAIN/setup/merge_settings.py" "$HOME/.claude/settings.json"
+/usr/bin/python3 "$BRAIN/setup/merge_settings.py" "$HOME/.claude/settings.json" >/dev/null
 PL="$HOME/Library/LaunchAgents/com.ecm.team-save.plist"; mkdir -p "$(dirname "$PL")"
 sed -e "s#__HOME__#$HOME#g" -e "s#__NAME__#$NAME#g" "$BRAIN/setup/com.ecm.team-save.plist" > "$PL"
 launchctl bootout "gui/$(id -u)" "$PL" 2>/dev/null || true
